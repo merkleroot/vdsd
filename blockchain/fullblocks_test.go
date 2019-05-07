@@ -12,15 +12,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ltcsuite/ltcd/blockchain"
-	"github.com/ltcsuite/ltcd/blockchain/fullblocktests"
-	"github.com/ltcsuite/ltcd/chaincfg"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/database"
-	_ "github.com/ltcsuite/ltcd/database/ffldb"
-	"github.com/ltcsuite/ltcd/txscript"
-	"github.com/ltcsuite/ltcd/wire"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/blockchain"
+	"github.com/merkleroot/vdsd/blockchain/fullblocktests"
+	"github.com/merkleroot/vdsd/chaincfg"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/database"
+	_ "github.com/merkleroot/vdsd/database/ffldb"
+	"github.com/merkleroot/vdsd/txscript"
+	"github.com/merkleroot/vdsd/wire"
+	"github.com/merkleroot/vdsutil"
 )
 
 const (
@@ -151,7 +151,7 @@ func TestFullBlocks(t *testing.T) {
 	// specified in the test.
 	testAcceptedBlock := func(item fullblocktests.AcceptedBlock) {
 		blockHeight := item.Height
-		block := ltcutil.NewBlock(item.Block)
+		block := vdsutil.NewBlock(item.Block)
 		block.SetHeight(blockHeight)
 		t.Logf("Testing block %s (hash %s, height %d)",
 			item.Name, block.Hash(), blockHeight)
@@ -185,7 +185,7 @@ func TestFullBlocks(t *testing.T) {
 	// specified in the test.
 	testRejectedBlock := func(item fullblocktests.RejectedBlock) {
 		blockHeight := item.Height
-		block := ltcutil.NewBlock(item.Block)
+		block := vdsutil.NewBlock(item.Block)
 		block.SetHeight(blockHeight)
 		t.Logf("Testing block %s (hash %s, height %d)",
 			item.Name, block.Hash(), blockHeight)
@@ -242,7 +242,7 @@ func TestFullBlocks(t *testing.T) {
 	// orphan or rejected with a rule violation.
 	testOrphanOrRejectedBlock := func(item fullblocktests.OrphanOrRejectedBlock) {
 		blockHeight := item.Height
-		block := ltcutil.NewBlock(item.Block)
+		block := vdsutil.NewBlock(item.Block)
 		block.SetHeight(blockHeight)
 		t.Logf("Testing block %s (hash %s, height %d)",
 			item.Name, block.Hash(), blockHeight)
@@ -270,7 +270,7 @@ func TestFullBlocks(t *testing.T) {
 	// block specified in the provided test instance.
 	testExpectedTip := func(item fullblocktests.ExpectedTip) {
 		blockHeight := item.Height
-		block := ltcutil.NewBlock(item.Block)
+		block := vdsutil.NewBlock(item.Block)
 		block.SetHeight(blockHeight)
 		t.Logf("Testing tip for block %s (hash %s, height %d)",
 			item.Name, block.Hash(), blockHeight)

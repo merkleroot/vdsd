@@ -7,13 +7,13 @@ package main
 import (
 	"sync/atomic"
 
-	"github.com/ltcsuite/ltcd/blockchain"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/mempool"
-	"github.com/ltcsuite/ltcd/netsync"
-	"github.com/ltcsuite/ltcd/peer"
-	"github.com/ltcsuite/ltcd/wire"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/blockchain"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/mempool"
+	"github.com/merkleroot/vdsd/netsync"
+	"github.com/merkleroot/vdsd/peer"
+	"github.com/merkleroot/vdsd/wire"
+	"github.com/merkleroot/vdsutil"
 )
 
 // rpcPeer provides a peer for use with the RPC server and implements the
@@ -247,7 +247,7 @@ func (b *rpcSyncMgr) IsCurrent() bool {
 //
 // This function is safe for concurrent access and is part of the
 // rpcserverSyncManager interface implementation.
-func (b *rpcSyncMgr) SubmitBlock(block *ltcutil.Block, flags blockchain.BehaviorFlags) (bool, error) {
+func (b *rpcSyncMgr) SubmitBlock(block *vdsutil.Block, flags blockchain.BehaviorFlags) (bool, error) {
 	return b.syncMgr.ProcessBlock(block, flags)
 }
 

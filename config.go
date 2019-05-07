@@ -20,25 +20,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ltcsuite/ltcd/blockchain"
-	"github.com/ltcsuite/ltcd/chaincfg"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/connmgr"
-	"github.com/ltcsuite/ltcd/database"
-	_ "github.com/ltcsuite/ltcd/database/ffldb"
-	"github.com/ltcsuite/ltcd/mempool"
-	"github.com/ltcsuite/ltcd/peer"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/blockchain"
+	"github.com/merkleroot/vdsd/chaincfg"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/connmgr"
+	"github.com/merkleroot/vdsd/database"
+	_ "github.com/merkleroot/vdsd/database/ffldb"
+	"github.com/merkleroot/vdsd/mempool"
+	"github.com/merkleroot/vdsd/peer"
+	"github.com/merkleroot/vdsutil"
 	"github.com/btcsuite/go-socks/socks"
 	flags "github.com/jessevdk/go-flags"
 )
 
 const (
-	defaultConfigFilename        = "ltcd.conf"
+	defaultConfigFilename        = "vdsd.conf"
 	defaultDataDirname           = "data"
 	defaultLogLevel              = "info"
 	defaultLogDirname            = "logs"
-	defaultLogFilename           = "ltcd.log"
+	defaultLogFilename           = "vdsd.log"
 	defaultMaxPeers              = 125
 	defaultBanDuration           = time.Hour * 24
 	defaultBanThreshold          = 100
@@ -61,13 +61,13 @@ const (
 	defaultMaxOrphanTransactions = 100
 	defaultMaxOrphanTxSize       = 100000
 	defaultSigCacheMaxSize       = 100000
-	sampleConfigFilename         = "sample-ltcd.conf"
+	sampleConfigFilename         = "sample-vdsd.conf"
 	defaultTxIndex               = false
 	defaultAddrIndex             = false
 )
 
 var (
-	defaultHomeDir     = ltcutil.AppDataDir("ltcd", false)
+	defaultHomeDir     = vdsutil.AppDataDir("vdsd", false)
 	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
 	defaultDataDir     = filepath.Join(defaultHomeDir, defaultDataDirname)
 	knownDbTypes       = database.SupportedDrivers()
@@ -89,7 +89,7 @@ func minUint32(a, b uint32) uint32 {
 	return b
 }
 
-// config defines the configuration options for ltcd.
+// config defines the configuration options for vdsd.
 //
 // See loadConfig for details on the configuration load process.
 type config struct {
@@ -167,8 +167,8 @@ type config struct {
 	oniondial            func(string, string, time.Duration) (net.Conn, error)
 	dial                 func(string, string, time.Duration) (net.Conn, error)
 	addCheckpoints       []chaincfg.Checkpoint
-	miningAddrs          []ltcutil.Address
-	minRelayTxFee        ltcutil.Amount
+	miningAddrs          []vdsutil.Address
+	minRelayTxFee        vdsutil.Amount
 	whitelists           []*net.IPNet
 }
 
@@ -397,7 +397,7 @@ func newConfigParser(cfg *config, so *serviceOptions, options flags.Options) *fl
 // 	3) Load configuration file overwriting defaults with any specified options
 // 	4) Parse CLI options and overwrite/add any specified options
 //
-// The above results in ltcd functioning properly without any config settings
+// The above results in vdsd functioning properly without any config settings
 // while still allowing the user to override settings with config files and
 // command line options.  Command line options always take precedence.
 func loadConfig() (*config, []string, error) {
@@ -727,7 +727,7 @@ func loadConfig() (*config, []string, error) {
 	}
 
 	if cfg.DisableRPC {
-		ltcdLog.Infof("RPC service is disabled")
+		vdsdLog.Infof("RPC service is disabled")
 	}
 
 	// Default RPC to listen on localhost only.
@@ -753,7 +753,7 @@ func loadConfig() (*config, []string, error) {
 	}
 
 	// Validate the the minrelaytxfee.
-	cfg.minRelayTxFee, err = ltcutil.NewAmount(cfg.MinRelayTxFee)
+	cfg.minRelayTxFee, err = vdsutil.NewAmount(cfg.MinRelayTxFee)
 	if err != nil {
 		str := "%s: invalid minrelaytxfee: %v"
 		err := fmt.Errorf(str, funcName, err)
@@ -865,9 +865,9 @@ func loadConfig() (*config, []string, error) {
 	}
 
 	// Check mining addresses are valid and saved parsed versions.
-	cfg.miningAddrs = make([]ltcutil.Address, 0, len(cfg.MiningAddrs))
+	cfg.miningAddrs = make([]vdsutil.Address, 0, len(cfg.MiningAddrs))
 	for _, strAddr := range cfg.MiningAddrs {
-		addr, err := ltcutil.DecodeAddress(strAddr, activeNetParams.Params)
+		addr, err := vdsutil.DecodeAddress(strAddr, activeNetParams.Params)
 		if err != nil {
 			str := "%s: mining address '%s' failed to decode: %v"
 			err := fmt.Errorf(str, funcName, strAddr, err)
@@ -1080,13 +1080,13 @@ func loadConfig() (*config, []string, error) {
 	// done.  This prevents the warning on help messages and invalid
 	// options.  Note this should go directly before the return.
 	if configFileError != nil {
-		ltcdLog.Warnf("%v", configFileError)
+		vdsdLog.Warnf("%v", configFileError)
 	}
 
 	return &cfg, remainingArgs, nil
 }
 
-// createDefaultConfig copies the file sample-ltcd.conf to the given destination path,
+// createDefaultConfig copies the file sample-vdsd.conf to the given destination path,
 // and populates it with some randomly generated RPC username and password.
 func createDefaultConfigFile(destinationPath string) error {
 	// Create the destination directory if it does not exists
@@ -1153,12 +1153,12 @@ func createDefaultConfigFile(destinationPath string) error {
 	return nil
 }
 
-// ltcdDial connects to the address on the named network using the appropriate
+// vdsdDial connects to the address on the named network using the appropriate
 // dial function depending on the address and configuration options.  For
 // example, .onion addresses will be dialed using the onion specific proxy if
 // one was specified, but will otherwise use the normal dial function (which
 // could itself use a proxy or not).
-func ltcdDial(addr net.Addr) (net.Conn, error) {
+func vdsdDial(addr net.Addr) (net.Conn, error) {
 	if strings.Contains(addr.String(), ".onion:") {
 		return cfg.oniondial(addr.Network(), addr.String(),
 			defaultConnectTimeout)
@@ -1166,14 +1166,14 @@ func ltcdDial(addr net.Addr) (net.Conn, error) {
 	return cfg.dial(addr.Network(), addr.String(), defaultConnectTimeout)
 }
 
-// ltcdLookup resolves the IP of the given host using the correct DNS lookup
+// vdsdLookup resolves the IP of the given host using the correct DNS lookup
 // function depending on the configuration options.  For example, addresses will
 // be resolved using tor when the --proxy flag was specified unless --noonion
 // was also specified in which case the normal system DNS resolver will be used.
 //
 // Any attempt to resolve a tor address (.onion) will return an error since they
 // are not intended to be resolved outside of the tor proxy.
-func ltcdLookup(host string) ([]net.IP, error) {
+func vdsdLookup(host string) ([]net.IP, error) {
 	if strings.HasSuffix(host, ".onion") {
 		return nil, fmt.Errorf("attempt to resolve tor address %s", host)
 	}

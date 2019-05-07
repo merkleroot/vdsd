@@ -15,11 +15,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ltcsuite/ltcd/chaincfg"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/rpcclient"
-	"github.com/ltcsuite/ltcd/wire"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/chaincfg"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/rpcclient"
+	"github.com/merkleroot/vdsd/wire"
+	"github.com/merkleroot/vdsutil"
 )
 
 const (
@@ -64,10 +64,10 @@ var (
 // Harness to exercise functionality.
 type HarnessTestCase func(r *Harness, t *testing.T)
 
-// Harness fully encapsulates an active ltcd process to provide a unified
-// platform for creating rpc driven integration tests involving ltcd. The
-// active ltcd node will typically be run in simnet mode in order to allow for
-// easy generation of test blockchains.  The active ltcd process is fully
+// Harness fully encapsulates an active vdsd process to provide a unified
+// platform for creating rpc driven integration tests involving vdsd. The
+// active vdsd node will typically be run in simnet mode in order to allow for
+// easy generation of test blockchains.  The active vdsd process is fully
 // managed by Harness, which handles the necessary initialization, and teardown
 // of the process along with any temporary directories created as a result.
 // Multiple Harness instances may be run concurrently, in order to allow for
@@ -171,7 +171,7 @@ func New(activeNet *chaincfg.Params, handlers *rpcclient.NotificationHandlers,
 	// callback.
 	if handlers.OnFilteredBlockConnected != nil {
 		obc := handlers.OnFilteredBlockConnected
-		handlers.OnFilteredBlockConnected = func(height int32, header *wire.BlockHeader, filteredTxns []*ltcutil.Tx) {
+		handlers.OnFilteredBlockConnected = func(height int32, header *wire.BlockHeader, filteredTxns []*vdsutil.Tx) {
 			wallet.IngestBlock(height, header, filteredTxns)
 			obc(height, header, filteredTxns)
 		}
@@ -214,7 +214,7 @@ func New(activeNet *chaincfg.Params, handlers *rpcclient.NotificationHandlers,
 // NOTE: This method and TearDown should always be called from the same
 // goroutine as they are not concurrent safe.
 func (h *Harness) SetUp(createTestChain bool, numMatureOutputs uint32) error {
-	// Start the ltcd node itself. This spawns a new process which will be
+	// Start the vdsd node itself. This spawns a new process which will be
 	// managed
 	if err := h.node.start(); err != nil {
 		return err
@@ -227,12 +227,12 @@ func (h *Harness) SetUp(createTestChain bool, numMatureOutputs uint32) error {
 
 	// Filter transactions that pay to the coinbase associated with the
 	// wallet.
-	filterAddrs := []ltcutil.Address{h.wallet.coinbaseAddr}
+	filterAddrs := []vdsutil.Address{h.wallet.coinbaseAddr}
 	if err := h.Node.LoadTxFilter(true, filterAddrs, nil); err != nil {
 		return err
 	}
 
-	// Ensure ltcd properly dispatches our registered call-back for each new
+	// Ensure vdsd properly dispatches our registered call-back for each new
 	// block. Otherwise, the memWallet won't function properly.
 	if err := h.Node.NotifyBlocks(); err != nil {
 		return err
@@ -301,7 +301,7 @@ func (h *Harness) TearDown() error {
 	return h.tearDown()
 }
 
-// connectRPCClient attempts to establish an RPC connection to the created ltcd
+// connectRPCClient attempts to establish an RPC connection to the created vdsd
 // process belonging to this Harness instance. If the initial connection
 // attempt fails, this function will retry h.maxConnRetries times, backing off
 // the time between subsequent attempts. If after h.maxConnRetries attempts,
@@ -333,7 +333,7 @@ func (h *Harness) connectRPCClient() error {
 // wallet.
 //
 // This function is safe for concurrent access.
-func (h *Harness) NewAddress() (ltcutil.Address, error) {
+func (h *Harness) NewAddress() (vdsutil.Address, error) {
 	return h.wallet.NewAddress()
 }
 
@@ -341,7 +341,7 @@ func (h *Harness) NewAddress() (ltcutil.Address, error) {
 // wallet.
 //
 // This function is safe for concurrent access.
-func (h *Harness) ConfirmedBalance() ltcutil.Amount {
+func (h *Harness) ConfirmedBalance() vdsutil.Amount {
 	return h.wallet.ConfirmedBalance()
 }
 
@@ -351,7 +351,7 @@ func (h *Harness) ConfirmedBalance() ltcutil.Amount {
 //
 // This function is safe for concurrent access.
 func (h *Harness) SendOutputs(targetOutputs []*wire.TxOut,
-	feeRate ltcutil.Amount) (*chainhash.Hash, error) {
+	feeRate vdsutil.Amount) (*chainhash.Hash, error) {
 
 	return h.wallet.SendOutputs(targetOutputs, feeRate)
 }
@@ -362,7 +362,7 @@ func (h *Harness) SendOutputs(targetOutputs []*wire.TxOut,
 //
 // This function is safe for concurrent access.
 func (h *Harness) SendOutputsWithoutChange(targetOutputs []*wire.TxOut,
-	feeRate ltcutil.Amount) (*chainhash.Hash, error) {
+	feeRate vdsutil.Amount) (*chainhash.Hash, error) {
 
 	return h.wallet.SendOutputsWithoutChange(targetOutputs, feeRate)
 }
@@ -379,7 +379,7 @@ func (h *Harness) SendOutputsWithoutChange(targetOutputs []*wire.TxOut,
 //
 // This function is safe for concurrent access.
 func (h *Harness) CreateTransaction(targetOutputs []*wire.TxOut,
-	feeRate ltcutil.Amount, change bool) (*wire.MsgTx, error) {
+	feeRate vdsutil.Amount, change bool) (*wire.MsgTx, error) {
 
 	return h.wallet.CreateTransaction(targetOutputs, feeRate, change)
 }
@@ -416,8 +416,8 @@ func (h *Harness) P2PAddress() string {
 // blockTime parameter if one doesn't wish to set a custom time.
 //
 // This function is safe for concurrent access.
-func (h *Harness) GenerateAndSubmitBlock(txns []*ltcutil.Tx, blockVersion int32,
-	blockTime time.Time) (*ltcutil.Block, error) {
+func (h *Harness) GenerateAndSubmitBlock(txns []*vdsutil.Tx, blockVersion int32,
+	blockTime time.Time) (*vdsutil.Block, error) {
 	return h.GenerateAndSubmitBlockWithCustomCoinbaseOutputs(txns,
 		blockVersion, blockTime, []wire.TxOut{})
 }
@@ -437,8 +437,8 @@ func (h *Harness) GenerateAndSubmitBlock(txns []*ltcutil.Tx, blockVersion int32,
 //
 // This function is safe for concurrent access.
 func (h *Harness) GenerateAndSubmitBlockWithCustomCoinbaseOutputs(
-	txns []*ltcutil.Tx, blockVersion int32, blockTime time.Time,
-	mineTo []wire.TxOut) (*ltcutil.Block, error) {
+	txns []*vdsutil.Tx, blockVersion int32, blockTime time.Time,
+	mineTo []wire.TxOut) (*vdsutil.Block, error) {
 
 	h.Lock()
 	defer h.Unlock()
@@ -455,7 +455,7 @@ func (h *Harness) GenerateAndSubmitBlockWithCustomCoinbaseOutputs(
 	if err != nil {
 		return nil, err
 	}
-	prevBlock := ltcutil.NewBlock(mBlock)
+	prevBlock := vdsutil.NewBlock(mBlock)
 	prevBlock.SetHeight(prevBlockHeight)
 
 	// Create a new block including the specified transactions
@@ -494,7 +494,7 @@ func generateListeningAddresses() (string, string) {
 
 // baseDir is the directory path of the temp directory for all rpctest files.
 func baseDir() (string, error) {
-	dirPath := filepath.Join(os.TempDir(), "ltcd", "rpctest")
+	dirPath := filepath.Join(os.TempDir(), "vdsd", "rpctest")
 	err := os.MkdirAll(dirPath, 0755)
 	return dirPath, err
 }

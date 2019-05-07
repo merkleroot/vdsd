@@ -7,8 +7,8 @@ package chaincfg
 import (
 	"time"
 
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/wire"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/wire"
 )
 
 // genesisCoinbaseTx is the coinbase transaction for the genesis blocks for
@@ -58,7 +58,7 @@ var genesisHash = chainhash.Hash([chainhash.HashSize]byte{ // Make go vet happy.
 	0xa4, 0xef, 0x34, 0xd3, 0x14, 0x97, 0x9d, 0xc9,
 	0x98, 0x6e, 0x0f, 0x19, 0x25, 0x1e, 0xda, 0xba,
 	0x59, 0x40, 0xfd, 0x1f, 0xe3, 0x65, 0xa7, 0x12,
- })
+})
 
 // genesisMerkleRoot is the hash of the first transaction in the genesis block
 // for the main network.
@@ -67,18 +67,18 @@ var genesisMerkleRoot = chainhash.Hash([chainhash.HashSize]byte{ // Make go vet 
 	0xfa, 0xad, 0x9b, 0xe2, 0x53, 0x23, 0xff, 0xaf,
 	0xa3, 0x32, 0x32, 0xa1, 0x7c, 0x3e, 0xdf, 0x6c,
 	0xfd, 0x97, 0xbe, 0xe6, 0xba, 0xfb, 0xdd, 0x97,
- })
+})
 
 // genesisBlock defines the genesis block of the block chain which serves as the
 // public transaction ledger for the main network.
 var genesisBlock = wire.MsgBlock{
 	Header: wire.BlockHeader{
 		Version:    1,
-		PrevBlock:  chainhash.Hash{},         // 0000000000000000000000000000000000000000000000000000000000000000
-		MerkleRoot: genesisMerkleRoot,        // 97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9
+		PrevBlock:  chainhash.Hash{},  // 0000000000000000000000000000000000000000000000000000000000000000
+		MerkleRoot: genesisMerkleRoot, // 97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9
 		Timestamp:  time.Unix(1317972665, 0),
 		Bits:       0x1e0ffff0,
-		Nonce:      2084524493,
+		Nonce:      chainhash.Hash{},
 	},
 	Transactions: []*wire.MsgTx{&genesisCoinbaseTx},
 }
@@ -106,7 +106,7 @@ var regTestGenesisBlock = wire.MsgBlock{
 		MerkleRoot: regTestGenesisMerkleRoot, // 97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9
 		Timestamp:  time.Unix(1296688602, 0), // 2011-02-02 23:16:42 +0000 UTC
 		Bits:       0x207fffff,               // 545259519 [7fffff0000000000000000000000000000000000000000000000000000000000]
-		Nonce:      0,
+		Nonce:      chainhash.Hash{},
 	},
 	Transactions: []*wire.MsgTx{&genesisCoinbaseTx},
 }
@@ -144,7 +144,7 @@ var testNet4GenesisBlock = wire.MsgBlock{
 		MerkleRoot: testNet4GenesisMerkleRoot, // 97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9
 		Timestamp:  time.Unix(1486949366, 0),
 		Bits:       0x1e0ffff0,
-		Nonce:      293345,
+		Nonce:      chainhash.Hash{},
 	},
 	Transactions: []*wire.MsgTx{&genesisCoinbaseTx},
 }
@@ -172,7 +172,7 @@ var simNetGenesisBlock = wire.MsgBlock{
 		MerkleRoot: simNetGenesisMerkleRoot,  // 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
 		Timestamp:  time.Unix(1401292357, 0), // 2014-05-28 15:52:37 +0000 UTC
 		Bits:       0x207fffff,               // 545259519 [7fffff0000000000000000000000000000000000000000000000000000000000]
-		Nonce:      2,
+		Nonce:      chainhash.Hash{},
 	},
 	Transactions: []*wire.MsgTx{&genesisCoinbaseTx},
 }

@@ -5,9 +5,9 @@
 package mining
 
 import (
-	"github.com/ltcsuite/ltcd/blockchain"
-	"github.com/ltcsuite/ltcd/wire"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/blockchain"
+	"github.com/merkleroot/vdsd/wire"
+	"github.com/merkleroot/vdsutil"
 )
 
 const (
@@ -44,7 +44,7 @@ type Policy struct {
 	// TxMinFreeFee is the minimum fee in Satoshi/1000 bytes that is
 	// required for a transaction to be treated as free for mining purposes
 	// (block template generation).
-	TxMinFreeFee ltcutil.Amount
+	TxMinFreeFee vdsutil.Amount
 }
 
 // minInt is a helper function to return the minimum of two ints.  This avoids

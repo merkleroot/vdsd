@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ltcsuite/ltcd/chaincfg"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/database"
-	"github.com/ltcsuite/ltcd/wire"
+	"github.com/merkleroot/vdsd/chaincfg"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/database"
+	"github.com/merkleroot/vdsd/wire"
 )
 
 // blockStatus is a bit field representing the validation state of the block.
@@ -90,7 +90,7 @@ type blockNode struct {
 	// platforms.
 	version    int32
 	bits       uint32
-	nonce      uint32
+	nonce      chainhash.Hash
 	timestamp  int64
 	merkleRoot chainhash.Hash
 

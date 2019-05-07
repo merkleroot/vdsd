@@ -14,13 +14,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ltcsuite/ltcd/chaincfg"
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcd/database"
-	_ "github.com/ltcsuite/ltcd/database/ffldb"
-	"github.com/ltcsuite/ltcd/txscript"
-	"github.com/ltcsuite/ltcd/wire"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/chaincfg"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsd/database"
+	_ "github.com/merkleroot/vdsd/database/ffldb"
+	"github.com/merkleroot/vdsd/txscript"
+	"github.com/merkleroot/vdsd/wire"
+	"github.com/merkleroot/vdsutil"
 )
 
 const (
@@ -59,8 +59,8 @@ func isSupportedDbType(dbType string) bool {
 
 // loadBlocks reads files containing bitcoin block data (gzipped but otherwise
 // in the format bitcoind writes) from disk and returns them as an array of
-// ltcutil.Block.  This is largely borrowed from the test code in ltcdb.
-func loadBlocks(filename string) (blocks []*ltcutil.Block, err error) {
+// vdsutil.Block.  This is largely borrowed from the test code in vdsdb.
+func loadBlocks(filename string) (blocks []*vdsutil.Block, err error) {
 	filename = filepath.Join("testdata/", filename)
 
 	var network = wire.MainNet
@@ -79,7 +79,7 @@ func loadBlocks(filename string) (blocks []*ltcutil.Block, err error) {
 	}
 	defer fi.Close()
 
-	var block *ltcutil.Block
+	var block *vdsutil.Block
 
 	err = nil
 	for height := int64(1); err == nil; height++ {
@@ -105,7 +105,7 @@ func loadBlocks(filename string) (blocks []*ltcutil.Block, err error) {
 		// read block
 		dr.Read(rbytes)
 
-		block, err = ltcutil.NewBlockFromBytes(rbytes)
+		block, err = vdsutil.NewBlockFromBytes(rbytes)
 		if err != nil {
 			return
 		}

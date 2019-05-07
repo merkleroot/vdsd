@@ -8,8 +8,8 @@
 package database
 
 import (
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
-	"github.com/ltcsuite/ltcutil"
+	"github.com/merkleroot/vdsd/chaincfg/chainhash"
+	"github.com/merkleroot/vdsutil"
 )
 
 // Cursor represents a cursor over key/value pairs and nested buckets of a
@@ -227,7 +227,7 @@ type Tx interface {
 	//   - ErrTxClosed if the transaction has already been closed
 	//
 	// Other errors are possible depending on the implementation.
-	StoreBlock(block *ltcutil.Block) error
+	StoreBlock(block *vdsutil.Block) error
 
 	// HasBlock returns whether or not a block with the given hash exists
 	// in the database.
