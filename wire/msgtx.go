@@ -289,11 +289,14 @@ func NewTxOut(value int64, pkScript []byte) *TxOut {
 // Use the AddTxIn and AddTxOut functions to build up the list of transaction
 // inputs and outputs.
 type MsgTx struct {
-	Version  int32
-	Flag     uint8
-	TxIn     []*TxIn
-	TxOut    []*TxOut
-	LockTime uint32
+	Version      int32
+	Flag         uint8
+	TxIn         []*TxIn
+	TxOut        []*TxOut
+	LockTime     uint32
+	ExpiryHeight uint32
+	ValueBalance int64
+	BindingSig   [67]byte
 }
 
 // AddTxIn adds a transaction input to the message.
@@ -587,6 +590,24 @@ func (msg *MsgTx) BtcDecode(r io.Reader, pver uint32, enc MessageEncoding) error
 		return err
 	}
 
+	msg.ExpiryHeight, err = binarySerializer.Uint32(r, littleEndian)
+	if err != nil {
+		returnScriptBuffers()
+		return err
+	}
+
+	err = readElement(r, &msg.ValueBalance)
+	if err != nil {
+		returnScriptBuffers()
+		return err
+	}
+
+	err = readElement(r, &msg.BindingSig)
+	if err != nil {
+		returnScriptBuffers()
+		return err
+	}
+
 	// Create a single allocation to house all of the scripts and set each
 	// input signature script and output public key script to the
 	// appropriate subslice of the overall contiguous buffer.  Then, return
@@ -754,7 +775,23 @@ func (msg *MsgTx) BtcEncode(w io.Writer, pver uint32, enc MessageEncoding) error
 		}
 	}
 
-	return binarySerializer.PutUint32(w, littleEndian, msg.LockTime)
+	err = binarySerializer.PutUint32(w, littleEndian, msg.LockTime)
+	if err != nil {
+		return err
+	}
+	err = binarySerializer.PutUint32(w, littleEndian, msg.ExpiryHeight)
+	if err != nil {
+		return err
+	}
+	err = binarySerializer.PutUint64(w, littleEndian, uint64(msg.ValueBalance))
+	if err != nil {
+		return err
+	}
+	err = writeElement(w, msg.BindingSig)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // HasWitness returns false if none of the inputs within the transaction

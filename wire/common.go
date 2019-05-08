@@ -278,6 +278,14 @@ func readElement(r io.Reader, element interface{}) error {
 		}
 		return nil
 
+	// binding_sig_g
+	case *[67]byte:
+		_, err := io.ReadFull(r, e[:])
+		if err != nil {
+			return err
+		}
+		return nil
+
 	case *chainhash.Hash:
 		_, err := io.ReadFull(r, e[:])
 		if err != nil {
@@ -406,6 +414,14 @@ func writeElement(w io.Writer, element interface{}) error {
 
 	// IP address.
 	case [16]byte:
+		_, err := w.Write(e[:])
+		if err != nil {
+			return err
+		}
+		return nil
+
+	// binding sig
+	case [67]byte:
 		_, err := w.Write(e[:])
 		if err != nil {
 			return err
