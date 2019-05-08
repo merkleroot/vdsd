@@ -13,7 +13,7 @@ import (
 	"github.com/merkleroot/vdsd/database"
 	_ "github.com/merkleroot/vdsd/database/ffldb"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -24,7 +24,7 @@ const (
 )
 
 var (
-	vdsdHomeDir     = ltcutil.AppDataDir("ltcd", false)
+	vdsdHomeDir     = vdsutil.AppDataDir("ltcd", false)
 	defaultDataDir  = filepath.Join(vdsdHomeDir, "data")
 	knownDbTypes    = database.SupportedDrivers()
 	activeNetParams = &chaincfg.MainNetParams

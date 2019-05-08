@@ -16,7 +16,7 @@ import (
 	"github.com/merkleroot/vdsd/chaincfg/chainhash"
 	"github.com/merkleroot/vdsd/database"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 )
 
 var zeroHash = chainhash.Hash{}
@@ -94,7 +94,7 @@ func (bi *blockImporter) readBlock() ([]byte, error) {
 // with any potential errors.
 func (bi *blockImporter) processBlock(serializedBlock []byte) (bool, error) {
 	// Deserialize the block which includes checks for malformed blocks.
-	block, err := ltcutil.NewBlockFromBytes(serializedBlock)
+	block, err := vdsutil.NewBlockFromBytes(serializedBlock)
 	if err != nil {
 		return false, err
 	}

@@ -920,7 +920,7 @@ func (idx *AddrIndex) RemoveUnconfirmedTx(hash *chainhash.Hash) {
 // Unsupported address types are ignored and will result in no results.
 //
 // This function is safe for concurrent access.
-func (idx *AddrIndex) UnconfirmedTxnsForAddress(addr vdsutil.Address) []*ltcutil.Tx {
+func (idx *AddrIndex) UnconfirmedTxnsForAddress(addr vdsutil.Address) []*vdsutil.Tx {
 	// Ignore unsupported address types.
 	addrKey, err := addrToKey(addr)
 	if err != nil {

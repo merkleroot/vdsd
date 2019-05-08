@@ -989,7 +989,7 @@ func newRedeemingTxNotification(txHex string, index int, block *vdsutil.Block) (
 // address.  A spent notification request is automatically registered for
 // the client for each matching output.
 func (m *wsNotificationManager) notifyForTxOuts(ops map[wire.OutPoint]map[chan struct{}]*wsClient,
-	addrs map[string]map[chan struct{}]*wsClient, tx *vdsutil.Tx, block *ltcutil.Block) {
+	addrs map[string]map[chan struct{}]*wsClient, tx *vdsutil.Tx, block *vdsutil.Block) {
 
 	// Nothing to do if nobody is listening for address notifications.
 	if len(addrs) == 0 {
@@ -1063,7 +1063,7 @@ func (m *wsNotificationManager) notifyRelevantTxAccepted(tx *vdsutil.Tx,
 // notifying websocket clients of outputs spending to a watched address
 // and inputs spending a watched outpoint.
 func (m *wsNotificationManager) notifyForTx(ops map[wire.OutPoint]map[chan struct{}]*wsClient,
-	addrs map[string]map[chan struct{}]*wsClient, tx *vdsutil.Tx, block *ltcutil.Block) {
+	addrs map[string]map[chan struct{}]*wsClient, tx *vdsutil.Tx, block *vdsutil.Block) {
 
 	if len(ops) != 0 {
 		m.notifyForTxIns(ops, tx, block)
@@ -1078,7 +1078,7 @@ func (m *wsNotificationManager) notifyForTx(ops map[wire.OutPoint]map[chan struc
 // spend a watched output.  If block is non-nil, any matching spent
 // requests are removed.
 func (m *wsNotificationManager) notifyForTxIns(ops map[wire.OutPoint]map[chan struct{}]*wsClient,
-	tx *vdsutil.Tx, block *ltcutil.Block) {
+	tx *vdsutil.Tx, block *vdsutil.Block) {
 
 	// Nothing to do if nobody is watching outpoints.
 	if len(ops) == 0 {

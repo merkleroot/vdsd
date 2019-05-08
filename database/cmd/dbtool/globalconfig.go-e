@@ -14,11 +14,11 @@ import (
 	"github.com/merkleroot/vdsd/database"
 	_ "github.com/merkleroot/vdsd/database/ffldb"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 )
 
 var (
-	vdsdHomeDir     = ltcutil.AppDataDir("ltcd", false)
+	vdsdHomeDir     = vdsutil.AppDataDir("ltcd", false)
 	knownDbTypes    = database.SupportedDrivers()
 	activeNetParams = &chaincfg.MainNetParams
 

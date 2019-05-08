@@ -13,19 +13,19 @@ import (
 	"github.com/merkleroot/vdsd/chaincfg/chainhash"
 	"github.com/merkleroot/vdsd/txscript"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 )
 
 // This example demonstrates creating a script which pays to a bitcoin address.
 // It also prints the created script hex and uses the DisasmString function to
 // display the disassembled script.
 func ExamplePayToAddrScript() {
-	// Parse the address to send the coins to into a ltcutil.Address
+	// Parse the address to send the coins to into a vdsutil.Address
 	// which is useful to ensure the accuracy of the address and determine
 	// the address type.  It is also required for the upcoming call to
 	// PayToAddrScript.
 	addressStr := "Leqay1p3dWuprsnwUjM2SBbrH9BiphaDUL"
-	address, err := ltcutil.DecodeAddress(addressStr, &chaincfg.MainNetParams)
+	address, err := vdsutil.DecodeAddress(addressStr, &chaincfg.MainNetParams)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -89,8 +89,8 @@ func ExampleSignTxOutput() {
 		return
 	}
 	privKey, pubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBytes)
-	pubKeyHash := ltcutil.Hash160(pubKey.SerializeCompressed())
-	addr, err := ltcutil.NewAddressPubKeyHash(pubKeyHash,
+	pubKeyHash := vdsutil.Hash160(pubKey.SerializeCompressed())
+	addr, err := vdsutil.NewAddressPubKeyHash(pubKeyHash,
 		&chaincfg.MainNetParams)
 	if err != nil {
 		fmt.Println(err)
@@ -129,7 +129,7 @@ func ExampleSignTxOutput() {
 	redeemTx.AddTxOut(txOut)
 
 	// Sign the redeeming transaction.
-	lookupKey := func(a ltcutil.Address) (*btcec.PrivateKey, bool, error) {
+	lookupKey := func(a vdsutil.Address) (*btcec.PrivateKey, bool, error) {
 		// Ordinarily this function would involve looking up the private
 		// key for the provided address, but since the only thing being
 		// signed in this example uses the address associated with the

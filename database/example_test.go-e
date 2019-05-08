@@ -14,7 +14,7 @@ import (
 	"github.com/merkleroot/vdsd/database"
 	_ "github.com/merkleroot/vdsd/database/ffldb"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 )
 
 // This example demonstrates creating a new database.
@@ -136,7 +136,7 @@ func Example_blockStorageAndRetrieval() {
 	// and example.
 	err = db.Update(func(tx database.Tx) error {
 		genesisBlock := chaincfg.MainNetParams.GenesisBlock
-		return tx.StoreBlock(ltcutil.NewBlock(genesisBlock))
+		return tx.StoreBlock(vdsutil.NewBlock(genesisBlock))
 	})
 	if err != nil {
 		fmt.Println(err)

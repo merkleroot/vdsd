@@ -90,7 +90,7 @@ type blockNode struct {
 	// platforms.
 	version    int32
 	bits       uint32
-	nonce      uint32
+	nonce      chainhash.Hash
 	timestamp  int64
 	merkleRoot chainhash.Hash
 

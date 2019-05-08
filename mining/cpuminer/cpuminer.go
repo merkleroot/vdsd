@@ -273,7 +273,7 @@ func (m *CPUMiner) solveBlock(msgBlock *wire.MsgBlock, blockHeight int32,
 			// hash is actually a double sha256 (two hashes), so
 			// increment the number of hashes completed for each
 			// attempt accordingly.
-			header.Nonce = i
+			header.Nonce = *new(chainhash.Hash)
 			hash, err := header.PowHash()
 			if err != nil {
 				return false

@@ -11,7 +11,7 @@ import (
 	"github.com/merkleroot/vdsd/mempool"
 	"github.com/merkleroot/vdsd/peer"
 	"github.com/merkleroot/vdsd/wire"
-	"github.com/merkleroot/ltcutil"
+	"github.com/merkleroot/vdsutil"
 )
 
 // PeerNotifier exposes methods to notify peers of status changes to
@@ -24,7 +24,7 @@ type PeerNotifier interface {
 
 	RelayInventory(invVect *wire.InvVect, data interface{})
 
-	TransactionConfirmed(tx *ltcutil.Tx)
+	TransactionConfirmed(tx *vdsutil.Tx)
 }
 
 // Config is a configuration struct used to initialize a new SyncManager.

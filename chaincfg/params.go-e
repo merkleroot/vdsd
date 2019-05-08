@@ -210,8 +210,10 @@ type Params struct {
 	Bech32HRPSegwit string
 
 	// Address encoding magics
-	PubKeyHashAddrID        byte // First byte of a P2PKH address
-	ScriptHashAddrID        byte // First byte of a P2SH address
+	PubKeyHashAddrID1       byte // First byte of a P2PKH address
+	PubKeyHashAddrID2       byte // First byte of a P2PKH address
+	ScriptHashAddrID1       byte // First byte of a P2SH address
+	ScriptHashAddrID2       byte // First byte of a P2SH address
 	PrivateKeyID            byte // First byte of a WIF private key
 	WitnessPubKeyHashAddrID byte // First byte of a P2WPKH address
 	WitnessScriptHashAddrID byte // First byte of a P2WSH address
@@ -307,8 +309,10 @@ var MainNetParams = Params{
 	Bech32HRPSegwit: "ltc", // always ltc for main net
 
 	// Address encoding magics
-	PubKeyHashAddrID:        0x30, // starts with L
-	ScriptHashAddrID:        0x32, // starts with M
+	PubKeyHashAddrID1:       0x10,
+	PubKeyHashAddrID2:       0x1c, // starts with L
+	ScriptHashAddrID1:       0x10, // starts with M
+	ScriptHashAddrID2:       0x41, // starts with M
 	PrivateKeyID:            0xB0, // starts with 6 (uncompressed) or T (compressed)
 	WitnessPubKeyHashAddrID: 0x06, // starts with p2
 	WitnessScriptHashAddrID: 0x0A, // starts with 7Xh
@@ -383,9 +387,11 @@ var RegressionNetParams = Params{
 	Bech32HRPSegwit: "bcrt", // always bcrt for reg test net
 
 	// Address encoding magics
-	PubKeyHashAddrID: 0x6f, // starts with m or n
-	ScriptHashAddrID: 0xc4, // starts with 2
-	PrivateKeyID:     0xef, // starts with 9 (uncompressed) or c (compressed)
+	PubKeyHashAddrID1: 0x1e,
+	PubKeyHashAddrID2: 0x2b, // starts with m or n
+	ScriptHashAddrID1: 0x1e, // starts with 2
+	ScriptHashAddrID2: 0x55, // starts with 2
+	PrivateKeyID:      0xef, // starts with 9 (uncompressed) or c (compressed)
 
 	// BIP32 hierarchical deterministic extended key magics
 	HDPrivateKeyID: [4]byte{0x04, 0x35, 0x83, 0x94}, // starts with tprv
@@ -467,8 +473,10 @@ var TestNet4Params = Params{
 	Bech32HRPSegwit: "tltc", // always tltc for test net
 
 	// Address encoding magics
-	PubKeyHashAddrID:        0x6f, // starts with m or n
-	ScriptHashAddrID:        0x3a, // starts with Q
+	PubKeyHashAddrID1:       0x1e, // starts with m or n
+	PubKeyHashAddrID2:       0x2b, // starts with m or n
+	ScriptHashAddrID1:       0x1e, // starts with 2
+	ScriptHashAddrID2:       0x55, // starts with 2
 	WitnessPubKeyHashAddrID: 0x52, // starts with QW
 	WitnessScriptHashAddrID: 0x31, // starts with T7n
 	PrivateKeyID:            0xef, // starts with 9 (uncompressed) or c (compressed)
@@ -547,8 +555,10 @@ var SimNetParams = Params{
 	Bech32HRPSegwit: "sltc", // always lsb for sim net
 
 	// Address encoding magics
-	PubKeyHashAddrID:        0x3f, // starts with S
-	ScriptHashAddrID:        0x7b, // starts with s
+	PubKeyHashAddrID1:       0x1e, // starts with S
+	PubKeyHashAddrID2:       0x2b, // starts with S
+	ScriptHashAddrID1:       0x1e, // starts with 2
+	ScriptHashAddrID2:       0x55, // starts with 2
 	PrivateKeyID:            0x64, // starts with 4 (uncompressed) or F (compressed)
 	WitnessPubKeyHashAddrID: 0x19, // starts with Gg
 	WitnessScriptHashAddrID: 0x28, // starts with ?
@@ -576,8 +586,10 @@ var (
 
 var (
 	registeredNets       = make(map[wire.BitcoinNet]struct{})
-	pubKeyHashAddrIDs    = make(map[byte]struct{})
-	scriptHashAddrIDs    = make(map[byte]struct{})
+	pubKeyHashAddrIDs1   = make(map[byte]struct{})
+	pubKeyHashAddrIDs2   = make(map[byte]struct{})
+	scriptHashAddrIDs1   = make(map[byte]struct{})
+	scriptHashAddrIDs2   = make(map[byte]struct{})
 	bech32SegwitPrefixes = make(map[string]struct{})
 	hdPrivToPubKeyIDs    = make(map[[4]byte][]byte)
 )
@@ -601,8 +613,10 @@ func Register(params *Params) error {
 		return ErrDuplicateNet
 	}
 	registeredNets[params.Net] = struct{}{}
-	pubKeyHashAddrIDs[params.PubKeyHashAddrID] = struct{}{}
-	scriptHashAddrIDs[params.ScriptHashAddrID] = struct{}{}
+	pubKeyHashAddrIDs1[params.PubKeyHashAddrID1] = struct{}{}
+	pubKeyHashAddrIDs2[params.PubKeyHashAddrID2] = struct{}{}
+	scriptHashAddrIDs1[params.ScriptHashAddrID1] = struct{}{}
+	scriptHashAddrIDs2[params.ScriptHashAddrID2] = struct{}{}
 	hdPrivToPubKeyIDs[params.HDPrivateKeyID] = params.HDPublicKeyID[:]
 
 	// A valid Bech32 encoded segwit address always has as prefix the
@@ -625,9 +639,10 @@ func mustRegister(params *Params) {
 // to the caller to check both this and IsScriptHashAddrID and decide whether an
 // address is a pubkey hash address, script hash address, neither, or
 // undeterminable (if both return true).
-func IsPubKeyHashAddrID(id byte) bool {
-	_, ok := pubKeyHashAddrIDs[id]
-	return ok
+func IsPubKeyHashAddrID(id []byte) bool {
+	_, ok1 := pubKeyHashAddrIDs1[id[0]]
+	_, ok2 := pubKeyHashAddrIDs2[id[1]]
+	return ok1 && ok2
 }
 
 // IsScriptHashAddrID returns whether the id is an identifier known to prefix a
@@ -636,9 +651,10 @@ func IsPubKeyHashAddrID(id byte) bool {
 // to the caller to check both this and IsPubKeyHashAddrID and decide whether an
 // address is a pubkey hash address, script hash address, neither, or
 // undeterminable (if both return true).
-func IsScriptHashAddrID(id byte) bool {
-	_, ok := scriptHashAddrIDs[id]
-	return ok
+func IsScriptHashAddrID(id []byte) bool {
+	_, ok1 := scriptHashAddrIDs1[id[0]]
+	_, ok2 := scriptHashAddrIDs2[id[1]]
+	return ok1 && ok2
 }
 
 // IsBech32SegwitPrefix returns whether the prefix is a known prefix for segwit

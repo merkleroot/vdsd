@@ -177,7 +177,7 @@ func TestBIP0113Activation(t *testing.T) {
 
 	// However, since the block validation consensus rules haven't yet
 	// activated, a block including the transaction should be accepted.
-	txns := []*vdsutil.Tx{ltcutil.NewTx(tx)}
+	txns := []*vdsutil.Tx{vdsutil.NewTx(tx)}
 	block, err := r.GenerateAndSubmitBlock(txns, -1, time.Time{})
 	if err != nil {
 		t.Fatalf("unable to submit block: %v", err)
@@ -266,7 +266,7 @@ func TestBIP0113Activation(t *testing.T) {
 				"due to being  non-final, instead: %v", err)
 		}
 
-		txns = []*vdsutil.Tx{ltcutil.NewTx(tx)}
+		txns = []*vdsutil.Tx{vdsutil.NewTx(tx)}
 		_, err := r.GenerateAndSubmitBlock(txns, -1, time.Time{})
 		if err == nil && timeLockDelta >= 0 {
 			t.Fatal("block should be rejected due to non-final " +
@@ -478,7 +478,7 @@ func TestBIP0068AndBIP0112Activation(t *testing.T) {
 		// However, this transaction should be accepted in a custom
 		// generated block as CSV validation for scripts within blocks
 		// shouldn't yet be active.
-		txns := []*vdsutil.Tx{ltcutil.NewTx(spendingTx)}
+		txns := []*vdsutil.Tx{vdsutil.NewTx(spendingTx)}
 		block, err := r.GenerateAndSubmitBlock(txns, -1, time.Time{})
 		if err != nil {
 			t.Fatalf("unable to submit block: %v", err)
@@ -675,7 +675,7 @@ func TestBIP0068AndBIP0112Activation(t *testing.T) {
 		// If the transaction should be rejected, manually mine a block
 		// with the non-final transaction. It should be rejected.
 		if !test.accept {
-			txns := []*vdsutil.Tx{ltcutil.NewTx(test.tx)}
+			txns := []*vdsutil.Tx{vdsutil.NewTx(test.tx)}
 			_, err := r.GenerateAndSubmitBlock(txns, -1, time.Time{})
 			if err == nil {
 				t.Fatalf("test #%d, invalid block accepted", i)

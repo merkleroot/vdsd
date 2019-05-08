@@ -469,7 +469,7 @@ func (r FutureSendToAddressResult) Receive() (*chainhash.Hash, error) {
 // returned instance.
 //
 // See SendToAddress for the blocking version and more details.
-func (c *Client) SendToAddressAsync(address vdsutil.Address, amount ltcutil.Amount) FutureSendToAddressResult {
+func (c *Client) SendToAddressAsync(address vdsutil.Address, amount vdsutil.Amount) FutureSendToAddressResult {
 	addr := address.EncodeAddress()
 	cmd := btcjson.NewSendToAddressCmd(addr, amount.ToBTC(), nil, nil)
 	return c.sendCmd(cmd)
@@ -483,7 +483,7 @@ func (c *Client) SendToAddressAsync(address vdsutil.Address, amount ltcutil.Amou
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) SendToAddress(address vdsutil.Address, amount ltcutil.Amount) (*chainhash.Hash, error) {
+func (c *Client) SendToAddress(address vdsutil.Address, amount vdsutil.Amount) (*chainhash.Hash, error) {
 	return c.SendToAddressAsync(address, amount).Receive()
 }
 
@@ -514,7 +514,7 @@ func (c *Client) SendToAddressCommentAsync(address vdsutil.Address,
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) SendToAddressComment(address vdsutil.Address, amount ltcutil.Amount, comment, commentTo string) (*chainhash.Hash, error) {
+func (c *Client) SendToAddressComment(address vdsutil.Address, amount vdsutil.Amount, comment, commentTo string) (*chainhash.Hash, error) {
 	return c.SendToAddressCommentAsync(address, amount, comment,
 		commentTo).Receive()
 }
@@ -548,7 +548,7 @@ func (r FutureSendFromResult) Receive() (*chainhash.Hash, error) {
 // returned instance.
 //
 // See SendFrom for the blocking version and more details.
-func (c *Client) SendFromAsync(fromAccount string, toAddress vdsutil.Address, amount ltcutil.Amount) FutureSendFromResult {
+func (c *Client) SendFromAsync(fromAccount string, toAddress vdsutil.Address, amount vdsutil.Amount) FutureSendFromResult {
 	addr := toAddress.EncodeAddress()
 	cmd := btcjson.NewSendFromCmd(fromAccount, addr, amount.ToBTC(), nil,
 		nil, nil)
@@ -563,7 +563,7 @@ func (c *Client) SendFromAsync(fromAccount string, toAddress vdsutil.Address, am
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) SendFrom(fromAccount string, toAddress vdsutil.Address, amount ltcutil.Amount) (*chainhash.Hash, error) {
+func (c *Client) SendFrom(fromAccount string, toAddress vdsutil.Address, amount vdsutil.Amount) (*chainhash.Hash, error) {
 	return c.SendFromAsync(fromAccount, toAddress, amount).Receive()
 }
 
@@ -572,7 +572,7 @@ func (c *Client) SendFrom(fromAccount string, toAddress vdsutil.Address, amount 
 // the returned instance.
 //
 // See SendFromMinConf for the blocking version and more details.
-func (c *Client) SendFromMinConfAsync(fromAccount string, toAddress vdsutil.Address, amount ltcutil.Amount, minConfirms int) FutureSendFromResult {
+func (c *Client) SendFromMinConfAsync(fromAccount string, toAddress vdsutil.Address, amount vdsutil.Amount, minConfirms int) FutureSendFromResult {
 	addr := toAddress.EncodeAddress()
 	cmd := btcjson.NewSendFromCmd(fromAccount, addr, amount.ToBTC(),
 		&minConfirms, nil, nil)
@@ -588,7 +588,7 @@ func (c *Client) SendFromMinConfAsync(fromAccount string, toAddress vdsutil.Addr
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) SendFromMinConf(fromAccount string, toAddress vdsutil.Address, amount ltcutil.Amount, minConfirms int) (*chainhash.Hash, error) {
+func (c *Client) SendFromMinConf(fromAccount string, toAddress vdsutil.Address, amount vdsutil.Amount, minConfirms int) (*chainhash.Hash, error) {
 	return c.SendFromMinConfAsync(fromAccount, toAddress, amount,
 		minConfirms).Receive()
 }
@@ -599,7 +599,7 @@ func (c *Client) SendFromMinConf(fromAccount string, toAddress vdsutil.Address, 
 //
 // See SendFromComment for the blocking version and more details.
 func (c *Client) SendFromCommentAsync(fromAccount string,
-	toAddress vdsutil.Address, amount ltcutil.Amount, minConfirms int,
+	toAddress vdsutil.Address, amount vdsutil.Amount, minConfirms int,
 	comment, commentTo string) FutureSendFromResult {
 
 	addr := toAddress.EncodeAddress()
@@ -656,7 +656,7 @@ func (r FutureSendManyResult) Receive() (*chainhash.Hash, error) {
 // returned instance.
 //
 // See SendMany for the blocking version and more details.
-func (c *Client) SendManyAsync(fromAccount string, amounts map[vdsutil.Address]ltcutil.Amount) FutureSendManyResult {
+func (c *Client) SendManyAsync(fromAccount string, amounts map[vdsutil.Address]vdsutil.Amount) FutureSendManyResult {
 	convertedAmounts := make(map[string]float64, len(amounts))
 	for addr, amount := range amounts {
 		convertedAmounts[addr.EncodeAddress()] = amount.ToBTC()
@@ -673,7 +673,7 @@ func (c *Client) SendManyAsync(fromAccount string, amounts map[vdsutil.Address]l
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) SendMany(fromAccount string, amounts map[vdsutil.Address]ltcutil.Amount) (*chainhash.Hash, error) {
+func (c *Client) SendMany(fromAccount string, amounts map[vdsutil.Address]vdsutil.Amount) (*chainhash.Hash, error) {
 	return c.SendManyAsync(fromAccount, amounts).Receive()
 }
 
@@ -683,7 +683,7 @@ func (c *Client) SendMany(fromAccount string, amounts map[vdsutil.Address]ltcuti
 //
 // See SendManyMinConf for the blocking version and more details.
 func (c *Client) SendManyMinConfAsync(fromAccount string,
-	amounts map[vdsutil.Address]ltcutil.Amount,
+	amounts map[vdsutil.Address]vdsutil.Amount,
 	minConfirms int) FutureSendManyResult {
 
 	convertedAmounts := make(map[string]float64, len(amounts))
@@ -705,7 +705,7 @@ func (c *Client) SendManyMinConfAsync(fromAccount string,
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
 func (c *Client) SendManyMinConf(fromAccount string,
-	amounts map[vdsutil.Address]ltcutil.Amount,
+	amounts map[vdsutil.Address]vdsutil.Amount,
 	minConfirms int) (*chainhash.Hash, error) {
 
 	return c.SendManyMinConfAsync(fromAccount, amounts, minConfirms).Receive()
@@ -717,7 +717,7 @@ func (c *Client) SendManyMinConf(fromAccount string,
 //
 // See SendManyComment for the blocking version and more details.
 func (c *Client) SendManyCommentAsync(fromAccount string,
-	amounts map[vdsutil.Address]ltcutil.Amount, minConfirms int,
+	amounts map[vdsutil.Address]vdsutil.Amount, minConfirms int,
 	comment string) FutureSendManyResult {
 
 	convertedAmounts := make(map[string]float64, len(amounts))
@@ -740,7 +740,7 @@ func (c *Client) SendManyCommentAsync(fromAccount string,
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
 func (c *Client) SendManyComment(fromAccount string,
-	amounts map[vdsutil.Address]ltcutil.Amount, minConfirms int,
+	amounts map[vdsutil.Address]vdsutil.Amount, minConfirms int,
 	comment string) (*chainhash.Hash, error) {
 
 	return c.SendManyCommentAsync(fromAccount, amounts, minConfirms,
@@ -791,7 +791,7 @@ func (c *Client) AddMultisigAddressAsync(requiredSigs int, addresses []vdsutil.A
 
 // AddMultisigAddress adds a multisignature address that requires the specified
 // number of signatures for the provided addresses to the wallet.
-func (c *Client) AddMultisigAddress(requiredSigs int, addresses []vdsutil.Address, account string) (ltcutil.Address, error) {
+func (c *Client) AddMultisigAddress(requiredSigs int, addresses []vdsutil.Address, account string) (vdsutil.Address, error) {
 	return c.AddMultisigAddressAsync(requiredSigs, addresses,
 		account).Receive()
 }
@@ -1661,7 +1661,7 @@ func (c *Client) GetReceivedByAddressAsync(address vdsutil.Address) FutureGetRec
 //
 // See GetReceivedByAddressMinConf to override the minimum number of
 // confirmations.
-func (c *Client) GetReceivedByAddress(address vdsutil.Address) (ltcutil.Amount, error) {
+func (c *Client) GetReceivedByAddress(address vdsutil.Address) (vdsutil.Amount, error) {
 	return c.GetReceivedByAddressAsync(address).Receive()
 }
 
@@ -1680,7 +1680,7 @@ func (c *Client) GetReceivedByAddressMinConfAsync(address vdsutil.Address, minCo
 // address with at least the specified number of minimum confirmations.
 //
 // See GetReceivedByAddress to use the default minimum number of confirmations.
-func (c *Client) GetReceivedByAddressMinConf(address vdsutil.Address, minConfirms int) (ltcutil.Amount, error) {
+func (c *Client) GetReceivedByAddressMinConf(address vdsutil.Address, minConfirms int) (vdsutil.Amount, error) {
 	return c.GetReceivedByAddressMinConfAsync(address, minConfirms).Receive()
 }
 
@@ -2057,7 +2057,7 @@ func (c *Client) DumpPrivKeyAsync(address vdsutil.Address) FutureDumpPrivKeyResu
 //
 // NOTE: This function requires to the wallet to be unlocked.  See the
 // WalletPassphrase function for more details.
-func (c *Client) DumpPrivKey(address vdsutil.Address) (*ltcutil.WIF, error) {
+func (c *Client) DumpPrivKey(address vdsutil.Address) (*vdsutil.WIF, error) {
 	return c.DumpPrivKeyAsync(address).Receive()
 }
 

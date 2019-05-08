@@ -25,7 +25,7 @@
 //          "fmt"
 //          "log"
 //
-//          "github.com/merkleroot/ltcutil"
+//          "github.com/merkleroot/vdsutil"
 //          "github.com/merkleroot/vdsd/chaincfg"
 //  )
 //
@@ -46,7 +46,7 @@
 //
 //          // Create and print new payment address, specific to the active network.
 //          pubKeyHash := make([]byte, 20)
-//          addr, err := ltcutil.NewAddressPubKeyHash(pubKeyHash, chainParams)
+//          addr, err := vdsutil.NewAddressPubKeyHash(pubKeyHash, chainParams)
 //          if err != nil {
 //                  log.Fatal(err)
 //          }

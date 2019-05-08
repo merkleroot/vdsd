@@ -260,7 +260,9 @@ func (t TxWitness) SerializeSize() int {
 // TxOut defines a bitcoin transaction output.
 type TxOut struct {
 	Value    int64
+	Flag     uint8
 	PkScript []byte
+	DataHash chainhash.Hash
 }
 
 // SerializeSize returns the number of bytes it would take to serialize the
@@ -268,7 +270,7 @@ type TxOut struct {
 func (t *TxOut) SerializeSize() int {
 	// Value 8 bytes + serialized varint size for the length of PkScript +
 	// PkScript bytes.
-	return 8 + VarIntSerializeSize(uint64(len(t.PkScript))) + len(t.PkScript)
+	return 8 + 1 + VarIntSerializeSize(uint64(len(t.PkScript))) + len(t.PkScript) + 32
 }
 
 // NewTxOut returns a new bitcoin transaction output with the provided
@@ -288,6 +290,7 @@ func NewTxOut(value int64, pkScript []byte) *TxOut {
 // inputs and outputs.
 type MsgTx struct {
 	Version  int32
+	Flag     uint8
 	TxIn     []*TxIn
 	TxOut    []*TxOut
 	LockTime uint32
@@ -414,6 +417,12 @@ func (msg *MsgTx) BtcDecode(r io.Reader, pver uint32, enc MessageEncoding) error
 		return err
 	}
 	msg.Version = int32(version)
+
+	txflag, err := binarySerializer.Uint8(r)
+	if err != nil {
+		return err
+	}
+	msg.Flag = uint8(txflag)
 
 	count, err := ReadVarInt(r, pver)
 	if err != nil {
@@ -680,6 +689,11 @@ func (msg *MsgTx) DeserializeNoWitness(r io.Reader) error {
 // database, as opposed to encoding transactions for the wire.
 func (msg *MsgTx) BtcEncode(w io.Writer, pver uint32, enc MessageEncoding) error {
 	err := binarySerializer.PutUint32(w, littleEndian, uint32(msg.Version))
+	if err != nil {
+		return err
+	}
+
+	err = binarySerializer.PutUint8(w, uint8(msg.Flag))
 	if err != nil {
 		return err
 	}
@@ -991,8 +1005,15 @@ func readTxOut(r io.Reader, pver uint32, version int32, to *TxOut) error {
 		return err
 	}
 
+	err = readElement(r, &to.Flag)
+	if err != nil {
+		return err
+	}
+
 	to.PkScript, err = readScript(r, pver, MaxMessagePayload,
 		"transaction output public key script")
+
+	_, err = io.ReadFull(r, to.DataHash[:])
 	return err
 }
 
@@ -1006,8 +1027,17 @@ func WriteTxOut(w io.Writer, pver uint32, version int32, to *TxOut) error {
 	if err != nil {
 		return err
 	}
+	err = binarySerializer.PutUint8(w, to.Flag)
+	if err != nil {
+		return err
+	}
 
-	return WriteVarBytes(w, pver, to.PkScript)
+	err = WriteVarBytes(w, pver, to.PkScript)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(to.DataHash.CloneBytes()[:])
+	return err
 }
 
 // writeTxWitness encodes the bitcoin protocol encoding for a transaction
