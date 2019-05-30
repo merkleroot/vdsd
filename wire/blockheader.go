@@ -122,6 +122,13 @@ func (h *BlockHeader) Serialize(w io.Writer) error {
 	return writeBlockHeader(w, 0, h)
 }
 
+func (h *BlockHeader) SerializeWithoutSolution(w io.Writer) error {
+	// At the current time, there is no difference between the wire encoding
+	// at protocol version 0 and the stable long-term storage format.  As
+	// a result, make use of writeBlockHeader.
+	return writeBlockHeaderWithoutSolution(w, 0, h)
+}
+
 // NewBlockHeader returns a new BlockHeader using the provided version, previous
 // block hash, merkle root hash, difficulty bits, and nonce used to generate the
 // block with defaults for the remaining fields.
@@ -156,4 +163,14 @@ func writeBlockHeader(w io.Writer, pver uint32, bh *BlockHeader) error {
 	return writeElements(w, bh.Version, &bh.PrevBlock, &bh.MerkleRoot,
 		&bh.FinalSaplingRoot, bh.VibPool, sec, bh.Bits, &bh.StateRoot,
 		&bh.UTXORoot, &bh.Nonce, &bh.Solution)
+}
+
+// writeBlockHeader writes a bitcoin block header to w.  See Serialize for
+// encoding block headers to be stored to disk, such as in a database, as
+// opposed to encoding for the wire.
+func writeBlockHeaderWithoutSolution(w io.Writer, pver uint32, bh *BlockHeader) error {
+	sec := uint32(bh.Timestamp.Unix())
+	return writeElements(w, bh.Version, &bh.PrevBlock, &bh.MerkleRoot,
+		&bh.FinalSaplingRoot, bh.VibPool, sec, bh.Bits, &bh.StateRoot,
+		&bh.UTXORoot, &bh.Nonce)
 }

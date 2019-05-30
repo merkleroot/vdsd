@@ -275,10 +275,12 @@ func (t *TxOut) SerializeSize() int {
 
 // NewTxOut returns a new bitcoin transaction output with the provided
 // transaction value and public key script.
-func NewTxOut(value int64, pkScript []byte) *TxOut {
+func NewTxOut(value int64, pkScript []byte, datahash chainhash.Hash, flag uint8) *TxOut {
 	return &TxOut{
 		Value:    value,
+		Flag:     flag,
 		PkScript: pkScript,
+		DataHash: datahash,
 	}
 }
 
@@ -401,7 +403,9 @@ func (msg *MsgTx) Copy() *MsgTx {
 		// Create new txOut with the deep copied data and append it to
 		// new Tx.
 		newTxOut := TxOut{
+			Flag:     oldTxOut.Flag,
 			Value:    oldTxOut.Value,
+			DataHash: oldTxOut.DataHash,
 			PkScript: newScript,
 		}
 		newTx.TxOut = append(newTx.TxOut, &newTxOut)
